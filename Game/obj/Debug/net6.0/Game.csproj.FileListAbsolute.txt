@@ -1,0 +1,15 @@
+/home/pixel/RiderProjects/2022-p2a-prg-big-bad-project-Pixelgon/Game/bin/Debug/net6.0/Game
+/home/pixel/RiderProjects/2022-p2a-prg-big-bad-project-Pixelgon/Game/bin/Debug/net6.0/Game.deps.json
+/home/pixel/RiderProjects/2022-p2a-prg-big-bad-project-Pixelgon/Game/bin/Debug/net6.0/Game.runtimeconfig.json
+/home/pixel/RiderProjects/2022-p2a-prg-big-bad-project-Pixelgon/Game/bin/Debug/net6.0/Game.dll
+/home/pixel/RiderProjects/2022-p2a-prg-big-bad-project-Pixelgon/Game/bin/Debug/net6.0/ref/Game.dll
+/home/pixel/RiderProjects/2022-p2a-prg-big-bad-project-Pixelgon/Game/bin/Debug/net6.0/Game.pdb
+/home/pixel/RiderProjects/2022-p2a-prg-big-bad-project-Pixelgon/Game/obj/Debug/net6.0/Game.csproj.AssemblyReference.cache
+/home/pixel/RiderProjects/2022-p2a-prg-big-bad-project-Pixelgon/Game/obj/Debug/net6.0/Game.GeneratedMSBuildEditorConfig.editorconfig
+/home/pixel/RiderProjects/2022-p2a-prg-big-bad-project-Pixelgon/Game/obj/Debug/net6.0/Game.AssemblyInfoInputs.cache
+/home/pixel/RiderProjects/2022-p2a-prg-big-bad-project-Pixelgon/Game/obj/Debug/net6.0/Game.AssemblyInfo.cs
+/home/pixel/RiderProjects/2022-p2a-prg-big-bad-project-Pixelgon/Game/obj/Debug/net6.0/Game.csproj.CoreCompileInputs.cache
+/home/pixel/RiderProjects/2022-p2a-prg-big-bad-project-Pixelgon/Game/obj/Debug/net6.0/Game.dll
+/home/pixel/RiderProjects/2022-p2a-prg-big-bad-project-Pixelgon/Game/obj/Debug/net6.0/ref/Game.dll
+/home/pixel/RiderProjects/2022-p2a-prg-big-bad-project-Pixelgon/Game/obj/Debug/net6.0/Game.pdb
+/home/pixel/RiderProjects/2022-p2a-prg-big-bad-project-Pixelgon/Game/obj/Debug/net6.0/Game.genruntimeconfig.cache
