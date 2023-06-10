@@ -1,115 +1,110 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
+using System.Text;
 
 namespace Game.Models
 {
-    internal class Games
+    public class Games
     {
-        private string[] _wordList {get; set;}
-        private static Random _random = new Random();
-        private string _word { get; set; }
-        private int _round { get; set; } = 0;
+        internal string[] _wordList {get; set;}
+        internal static Random _random = new Random();
+        internal string _currentWord { get; set; }
+        internal int _round { get; set; } = 0;
+        internal int _tries { get; set; } = 0;
 
         public Games(string wordlist = "Data/wordlist.txt")
         {
             string currentDirectory = AppDomain.CurrentDomain.BaseDirectory;
             string absolutePath = Path.Combine(currentDirectory, wordlist);
-            _wordList = Load(absolutePath);
-            _word = GetRandomWord();
+            _wordList = FileHandlerer.LoadWordlist(absolutePath);
         }
 
-        public bool Check(string word)
+        public bool Check(string word, Players player)
         {
-            return Array.Exists(_wordList, w => w.Trim().Equals(word.Trim(), StringComparison.OrdinalIgnoreCase));
-        }
-
-        private static string[] LoadWord(string word, string[] wordlist)
-        {
-            if (!Array.Exists(wordlist, w => w.Trim().Equals(word.Trim(), StringComparison.OrdinalIgnoreCase)))
+            if (_currentWord.EndsWith(word, StringComparison.OrdinalIgnoreCase) && _wordList.Contains(word))
             {
-                List<string> tempList = new List<string>(wordlist);
-                tempList.Add(word);
-                return tempList.ToArray();
-            }
-            else
-            {
-                return wordlist;
-            }
-        }
+                _currentWord = word;
+                _round++;
 
-        private static string[] Load(string wordlist)
-        {
-            List<string> wordList = new List<string>();
-
-            try
-            {
-                using (StreamReader sr = new StreamReader(wordlist))
+                if (_tries == 0)
                 {
-                    string line;
-                    while ((line = sr.ReadLine()) != null)
-                    {
-                        wordList.Add(line);
-                    }
+                    player.Score += 100;
                 }
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-                throw;
+                else
+                {
+                    player.Score /= (_tries * 2);
+                }
+
+                _tries = 0;
+                this.RemoveWordFromWordList();
+                return true;
             }
 
-            return wordList.ToArray();
+            player.Hp--;
+            _tries++;
+            return false;
+        }
+
+        public string GetWord()
+        {
+            if (_wordList.Length == 0)
+            {
+                return null;
+            }
+            var vysledek = _wordList.FirstOrDefault(s => s.StartsWith(_currentWord[_currentWord.Length - 1].ToString(), StringComparison.OrdinalIgnoreCase));
+            if (vysledek == null)
+            {
+                vysledek = _wordList.FirstOrDefault(s => RemoveDiacritics(s[0]) == RemoveDiacritics(_currentWord[_currentWord.Length - 1]));
+            }
+            _currentWord = vysledek;
+            this.RemoveWordFromWordList();
+            return _currentWord;
         }
 
         public string GetRandomWord()
         {
-            return _wordList[_random.Next(0, _wordList.Length-1)];
+            if(_wordList.Length == 0)
+            {
+                return null;
+            }
+            _currentWord = _wordList[_random.Next(0, _wordList.Length-1)];
+            return _currentWord;
         }
 
-        public void Menu()
+
+        public bool ChangeWordlist(string adr)
         {
-            Console.ForegroundColor = ConsoleColor.Blue;
-            Console.WriteLine("Vítej v hře Slovní fotbal!");
-            Console.ResetColor();
-            Console.WriteLine("1. Hrát");
-            Console.WriteLine("2. Statistiky");
-            Console.WriteLine("3. Změnit slovník");
-            Console.WriteLine("4. Ukončit");
-            Console.Write("Vyber možnost: ");
-            string input = Console.ReadLine();
-            switch (input)
+            Console.Clear();
+            string [] newWordlist = FileHandlerer.LoadWordlist(adr);
+            if(newWordlist.Length > 0)
             {
-                case "1":
-                    Console.Clear();
-                    Console.WriteLine("Začíná hra!");
-                    Round();
-                    break;
-                case "2":
-                    Console.Clear();
-                    Console.WriteLine("Statistiky");
-                    break;
-                case "3":
-                    Console.Clear();
-                    _wordList = Load(Console.ReadLine());
-                    return;
-                case "4":
-                    Console.Clear();
-                    Console.WriteLine("Ukončuji hru...");
-                    break;
-                default:
-                    Console.Clear();
-                    Console.ForegroundColor = ConsoleColor.Red;
-                    Console.WriteLine("Neplatná možnost!");
-                    Console.ResetColor();
-                    Menu();
-                    break;
+                _wordList = newWordlist;
+                return true;
             }
+            return false;
         }
-        
-        public void Round()
+
+        public void RemoveWordFromWordList()
         {
-            
+            _wordList = _wordList.Where(word => word != _currentWord).ToArray();
+        }
+
+        public char RemoveDiacritics(char c)
+        {
+            string s = c.ToString().Normalize(NormalizationForm.FormD);
+            StringBuilder sb = new StringBuilder();
+
+            foreach (var item in s)
+            {
+                if (CharUnicodeInfo.GetUnicodeCategory(item) != UnicodeCategory.NonSpacingMark)
+                {
+                    sb.Append(item);
+                }
+            }
+
+            return sb.ToString()[0];
         }
     }
 }
