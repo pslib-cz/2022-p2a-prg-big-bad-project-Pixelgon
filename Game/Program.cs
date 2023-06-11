@@ -8,6 +8,7 @@ class Program
     static void Main(string[] args)
     {
         Games game = new Games();
+        Players P = new Players();
         int option;
         do
         {
@@ -15,7 +16,7 @@ class Program
             switch (option)
             {
                 case 1:
-                    Render.Round(game);
+                    Render.Play(game, P);
                     break;
                 case 2:
                     Render.Stats();

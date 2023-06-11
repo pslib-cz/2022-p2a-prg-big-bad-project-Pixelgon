@@ -30,19 +30,21 @@ namespace Game.Models
 
                 if (_tries == 0)
                 {
-                    player.Score += 100;
+                    player.AddScore(100);
                 }
                 else
                 {
-                    player.Score /= (_tries * 2);
+                    player.AddScore((_tries * 2));
                 }
-
+                if (player._score % 1000 == 0 && player._hp < 4)
+                {
+                    player.AddHp();
+                }
                 _tries = 0;
-                this.RemoveWordFromWordList();
+                RemoveWordFromWordList(_currentWord);
                 return true;
             }
-
-            player.Hp--;
+            player.ReduceHp();
             _tries++;
             return false;
         }
@@ -58,9 +60,8 @@ namespace Game.Models
             {
                 vysledek = _wordList.FirstOrDefault(s => RemoveDiacritics(s[0]) == RemoveDiacritics(_currentWord[_currentWord.Length - 1]));
             }
-            _currentWord = vysledek;
-            this.RemoveWordFromWordList();
-            return _currentWord;
+            RemoveWordFromWordList(vysledek);
+            return vysledek;
         }
 
         public string GetRandomWord()
@@ -69,8 +70,7 @@ namespace Game.Models
             {
                 return null;
             }
-            _currentWord = _wordList[_random.Next(0, _wordList.Length-1)];
-            return _currentWord;
+            return _wordList[_random.Next(0, _wordList.Length-1)];;
         }
 
 
@@ -86,9 +86,9 @@ namespace Game.Models
             return false;
         }
 
-        public void RemoveWordFromWordList()
+        public void RemoveWordFromWordList(string wrd)
         {
-            _wordList = _wordList.Where(word => word != _currentWord).ToArray();
+            _wordList = _wordList.Where(word => word != wrd).ToArray();
         }
 
         public char RemoveDiacritics(char c)
@@ -105,6 +105,28 @@ namespace Game.Models
             }
 
             return sb.ToString()[0];
+        }
+
+        public bool Round(Players player)
+        {
+            if(_wordList.Length == 0)
+            {
+                return false;
+            }
+            if(player._hp == 0)
+            {
+                return false;
+            }
+            if(_round == 0)
+            {
+                _currentWord = GetRandomWord();
+            }
+            else
+            {
+                _currentWord = GetWord();
+            }
+            _round++;
+            return true;
         }
     }
 }

@@ -32,11 +32,11 @@ namespace Game.Models
     \|____________|\|_______|\|__|\|__|\|_______|        \|_______|\|__|\|__|\|__|\|__|\|__|\|__| \|__|");
                 Console.WriteLine("Vytvořil Pixelgon, pixelgon.cz");
                 Console.ResetColor();
-                Console.WriteLine($"{(option == 1 ? "\u001b[33m" : "\u001b[0m")}1. Hrát\u001b[0m");
-                Console.WriteLine($"{(option == 2 ? "\u001b[33m" : "\u001b[0m")}2. Statistiky\u001b[0m");
-                Console.WriteLine($"{(option == 3 ? "\u001b[33m" : "\u001b[0m")}3. Změnit slovník\u001b[0m");
-                Console.WriteLine($"{(option == 4 ? "\u001b[33m" : "\u001b[0m")}4. Ukončit\u001b[0m");
-                Console.WriteLine($"Vybral sis možnost číslo \u001b[33m{option}.\u001b[0m");
+                Console.WriteLine($"{(option == 1 ? "\x1b[96m" : "\u001b[0m")}1. Hrát\u001b[0m");
+                Console.WriteLine($"{(option == 2 ? "\x1b[96m" : "\u001b[0m")}2. Statistiky\u001b[0m");
+                Console.WriteLine($"{(option == 3 ? "\x1b[96m" : "\u001b[0m")}3. Změnit slovník\u001b[0m");
+                Console.WriteLine($"{(option == 4 ? "\x1b[91m" : "\u001b[0m")}4. Ukončit\u001b[0m");
+                Console.WriteLine($"Vybral sis možnost číslo \u001b[96m{option}.\u001b[0m");
                 ConsoleKeyInfo key = Console.ReadKey();
                 switch (key.Key)
                 {
@@ -56,10 +56,16 @@ namespace Game.Models
             return option;
         }
 
-        public static void Round(Games game)
+        public static void Play(Games game, Players player)
         {
-            Console.WriteLine(game.GetRandomWord());
-            Console.WriteLine(game.GetWord());
+            while (game._wordList.Length > 0 || player._hp > 0)
+            {
+                Console.Clear();
+                game.Round(player);
+                Console.WriteLine($"Kolo: \u001b[96m{game._round}\u001b[0m Score: \u001b[96m{player._score}\u001b[0m HP: \u001b[91m{player._hp}\u001b[0m");
+                Console.WriteLine($"Aktuální slovo je \u001b[96m{game._currentWord}.\u001b[0m");
+                game.Check(TextProcessor.RemoveSpecialCharacters(Console.ReadLine()), player);
+            }
         }
 
         public static void Stats()
@@ -95,17 +101,44 @@ namespace Game.Models
             Environment.Exit(0);
         }
 
-        public static void GameOver()
+        public static void GameOver(Games game, Players player)
         {
-
-        }
-
-        public static void Win()
-        {
-            Console.WriteLine("");
-            Console.ReadKey();
+            Console.ForegroundColor = ConsoleColor.Cyan;
+            if (game._wordList.Length ==0)
+            {
+                Console.WriteLine(@"  ___    ___ ________  ___  ___          ___       __   ___  ________   ________      
+ |\  \  /  /|\   __  \|\  \|\  \        |\  \     |\  \|\  \|\   ___  \|\_____  \     
+ \ \  \/  / | \  \|\  \ \  \\\  \       \ \  \    \ \  \ \  \ \  \\ \  \|____|\  \    
+  \ \    / / \ \  \\\  \ \  \\\  \       \ \  \  __\ \  \ \  \ \  \\ \  \    \ \__\   
+   \/  /  /   \ \  \\\  \ \  \\\  \       \ \  \|\__\_\  \ \  \ \  \\ \  \    \|__|   
+ __/  / /      \ \_______\ \_______\       \ \____________\ \__\ \__\\ \__\       ___ 
+|\___/ /        \|_______|\|_______|        \|____________|\|__|\|__| \|__|      |\__\
+\|___|/                                                                          \|__|");
+                Console.WriteLine("Máš ty vůbec život?");
+            }
+            else
+            {
+                Console.WriteLine(@" ________  ________  _____ ______   _______           ________  ___      ___ _______   ________  ___       
+|\   ____\|\   __  \|\   _ \  _   \|\  ___ \         |\   __  \|\  \    /  /|\  ___ \ |\   __  \|\  \      
+\ \  \___|\ \  \|\  \ \  \\\__\ \  \ \   __/|        \ \  \|\  \ \  \  /  / | \   __/|\ \  \|\  \ \  \     
+ \ \  \  __\ \   __  \ \  \\|__| \  \ \  \_|/__       \ \  \\\  \ \  \/  / / \ \  \_|/_\ \   _  _\ \  \    
+  \ \  \|\  \ \  \ \  \ \  \    \ \  \ \  \_|\ \       \ \  \\\  \ \    / /   \ \  \_|\ \ \  \\  \\ \__\   
+   \ \_______\ \__\ \__\ \__\    \ \__\ \_______\       \ \_______\ \__/ /     \ \_______\ \__\\ _\\|__|   
+    \|_______|\|__|\|__|\|__|     \|__|\|_______|        \|_______|\|__|/       \|_______|\|__|\|__|   ___ 
+                                                                                                      |\__\
+                                                                                                      \|__|");
+            }
+            Console.ResetColor();
+            Console.WriteLine($"Získal jsi {player._score} score.");
+            Console.WriteLine($"Ve slovníku zbylo {game._wordList.Length} slov.");
+            Console.WriteLine("Přeješ si uložit své score? (a/n)");
+            ConsoleKeyInfo key = Console.ReadKey();
+            if (key.Key == ConsoleKey.A)
+            {
+                Console.WriteLine("Zadejte své jméno.");
+                player.SetName(Console.ReadLine());
+            }
             Console.Clear();
         }
-
     }
 }

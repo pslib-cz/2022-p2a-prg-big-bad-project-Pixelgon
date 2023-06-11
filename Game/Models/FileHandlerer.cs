@@ -30,5 +30,23 @@ namespace Game.Models
 
             return wordList.ToArray();
         }
+
+        internal static void SaveStatistic(Games game, Players player)
+        {
+            string currentDirectory = AppDomain.CurrentDomain.BaseDirectory;
+            string absolutePath = Path.Combine(currentDirectory, "Data/statistic.txt");
+
+            try
+            {
+                using (StreamWriter sw = new StreamWriter(absolutePath, true))
+                {
+                    sw.WriteLine($"{player._name} | {player._score} | {game._round}");
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+            }
+        }   
     }
 }
