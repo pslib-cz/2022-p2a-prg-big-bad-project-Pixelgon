@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -11,9 +12,8 @@ namespace Game.Models
     {
         public static string RemoveSpecialCharacters(string text)
         {
-            string pattern = @"[^a-zA-Z0-9]";
+            string pattern = @"[^a-zA-Z0-9*ě*š*č*ř*ž*ý*á*í*é*-]";
             string cleanText = Regex.Replace(text, pattern, "");
-            Console.WriteLine(cleanText);
             return cleanText;
         }
     }

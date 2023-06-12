@@ -16,6 +16,7 @@ public class Players
     {
         _score = 0;
         _hp = 3;
+        _name = "";
     }
 
     public void SetName(string name)
@@ -36,5 +37,5 @@ public class Players
     public void AddHp()
     {
         _hp++;
-    }   
+    }
 }

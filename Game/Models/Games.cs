@@ -2,13 +2,15 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Text;
 
 namespace Game.Models
 {
     public class Games
     {
-        internal string[] _wordList {get; set;}
+        internal string _wordlistPath { get; set; }
+        internal string[] _wordList { get; set; }
         internal static Random _random = new Random();
         internal string _currentWord { get; set; }
         internal int _round { get; set; } = 0;
@@ -18,67 +20,48 @@ namespace Game.Models
         {
             string currentDirectory = AppDomain.CurrentDomain.BaseDirectory;
             string absolutePath = Path.Combine(currentDirectory, wordlist);
-            _wordList = FileHandlerer.LoadWordlist(absolutePath);
+            _wordlistPath = absolutePath;
+            _wordList = FileHandlerer.LoadWordlist(_wordlistPath);
         }
 
-        public bool Check(string word, Players player)
+        public bool Check(string word)
         {
-            if (_currentWord.EndsWith(word, StringComparison.OrdinalIgnoreCase) && _wordList.Contains(word))
+            if (string.IsNullOrEmpty(word))
             {
-                _currentWord = word;
-                _round++;
+                return false;
+            }
 
-                if (_tries == 0)
-                {
-                    player.AddScore(100);
-                }
-                else
-                {
-                    player.AddScore((_tries * 2));
-                }
-                if (player._score % 1000 == 0 && player._hp < 4)
-                {
-                    player.AddHp();
-                }
-                _tries = 0;
-                RemoveWordFromWordList(_currentWord);
+            if (_currentWord.EndsWith(word[0].ToString(), StringComparison.OrdinalIgnoreCase) && Array.Exists(_wordList, w => string.Equals(w, word, StringComparison.OrdinalIgnoreCase)))
+            {
                 return true;
             }
-            player.ReduceHp();
-            _tries++;
+
             return false;
         }
 
-        public string GetWord()
+        public string GetWord(string word)
         {
             if (_wordList.Length == 0)
             {
                 return null;
             }
-            var vysledek = _wordList.FirstOrDefault(s => s.StartsWith(_currentWord[_currentWord.Length - 1].ToString(), StringComparison.OrdinalIgnoreCase));
-            if (vysledek == null)
-            {
-                vysledek = _wordList.FirstOrDefault(s => RemoveDiacritics(s[0]) == RemoveDiacritics(_currentWord[_currentWord.Length - 1]));
-            }
-            RemoveWordFromWordList(vysledek);
-            return vysledek;
+            return _wordList.Where(s => s.StartsWith(word?[word.Length - 1].ToString(), StringComparison.OrdinalIgnoreCase)).OrderBy(x => _random.Next()).FirstOrDefault();
         }
 
         public string GetRandomWord()
         {
-            if(_wordList.Length == 0)
+            if (_wordList.Length == 0)
             {
                 return null;
             }
-            return _wordList[_random.Next(0, _wordList.Length-1)];;
+            return _wordList[_random.Next(0, _wordList.Length - 1)];
         }
-
 
         public bool ChangeWordlist(string adr)
         {
             Console.Clear();
-            string [] newWordlist = FileHandlerer.LoadWordlist(adr);
-            if(newWordlist.Length > 0)
+            string[] newWordlist = FileHandlerer.LoadWordlist(adr);
+            if (newWordlist.Length > 0)
             {
                 _wordList = newWordlist;
                 return true;
@@ -88,45 +71,71 @@ namespace Game.Models
 
         public void RemoveWordFromWordList(string wrd)
         {
-            _wordList = _wordList.Where(word => word != wrd).ToArray();
-        }
-
-        public char RemoveDiacritics(char c)
-        {
-            string s = c.ToString().Normalize(NormalizationForm.FormD);
-            StringBuilder sb = new StringBuilder();
-
-            foreach (var item in s)
-            {
-                if (CharUnicodeInfo.GetUnicodeCategory(item) != UnicodeCategory.NonSpacingMark)
-                {
-                    sb.Append(item);
-                }
-            }
-
-            return sb.ToString()[0];
+            _wordList = Array.FindAll(_wordList, w => !string.Equals(w, wrd, StringComparison.OrdinalIgnoreCase));
         }
 
         public bool Round(Players player)
         {
-            if(_wordList.Length == 0)
+            _round++;
+            if(player._score % 1500 == 0 && player._hp > 0 && player._hp < 3)
+            {
+                player.AddHp();
+            }
+            if (_wordList.Length == 0)
             {
                 return false;
             }
-            if(player._hp == 0)
+            if (player._hp == 0)
             {
                 return false;
             }
-            if(_round == 0)
+            if (_round == 1)
             {
                 _currentWord = GetRandomWord();
             }
             else
             {
-                _currentWord = GetWord();
+                _currentWord = GetWord(_currentWord);
             }
-            _round++;
+            if(_currentWord == null)
+            {
+                return false;
+            }
+            RemoveWordFromWordList(_currentWord);
             return true;
+        }
+
+        public bool RoundChecking(string word, Players player)
+        {
+            word = TextProcessor.RemoveSpecialCharacters(word);
+            if (Check(word))
+            {
+                _currentWord = word;
+                RemoveWordFromWordList(_currentWord);
+                player.AddScore(300 / (_tries == 0 ? 1 : _tries + 1));
+                _tries = 0;
+                return true;
+            }
+            else
+            {
+                _tries++;
+                player.ReduceHp();
+                return false;
+            }
+        }
+
+        public void Reset(Players player)
+        {
+            _round = 0;
+            _tries = 0;
+            _wordList = FileHandlerer.LoadWordlist(_wordlistPath);
+            player.Reset();
+        }
+
+        public void GenerateStat(string name, Games game, Players player)
+        {
+            player.SetName(TextProcessor.RemoveSpecialCharacters(name));
+            FileHandlerer.SaveStatistic(game, player);
         }
     }
 }
