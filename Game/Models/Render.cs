@@ -30,7 +30,7 @@ namespace Game.Models
                 Console.WriteLine("\nVytvořil Pixelgon, pixelgon.cz\n");
                 Console.ResetColor();
                 Console.WriteLine($"{(option == 1 ? "\x1b[93m" : "\u001b[0m")}1. Hrát\u001b[0m");
-                Console.WriteLine($"{(option == 2 ? "\x1b[93m" : "\u001b[0m")}2. Statistiky\u001b[0m");
+                Console.WriteLine($"{(option == 2 ? "\x1b[93m" : "\u001b[0m")}2. Statistika\u001b[0m");
                 Console.WriteLine($"{(option == 3 ? "\x1b[93m" : "\u001b[0m")}3. Změnit slovník\u001b[0m");
                 Console.WriteLine($"{(option == 4 ? "\x1b[91m" : "\u001b[0m")}4. Ukončit\u001b[0m");
                 Console.WriteLine($"\nVybral sis možnost \u001b[93m{option}.\u001b[0m");
