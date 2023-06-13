@@ -10,11 +10,12 @@ namespace Game.Models
 {
     public static class TextProcessor
     {
-        public static string RemoveSpecialCharacters(string text)
+        internal static string _wordPattern = @"[^a-zA-Z0-9ěščřžýáíé-]";
+
+        public static string PrepareWord(string text)
         {
-            string pattern = @"[^a-zA-Z0-9*ě*š*č*ř*ž*ý*á*í*é*-]";
-            string cleanText = Regex.Replace(text, pattern, "");
-            return cleanText;
+            return Regex.Replace(text, _wordPattern, "");
         }
+
     }
 }

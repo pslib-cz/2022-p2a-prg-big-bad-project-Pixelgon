@@ -1,0 +1,5 @@
+C:\Users\pixel\source\repos\pslib-cz\2022-p2a-prg-big-bad-project-Pixelgon\Game\bin\Release\net6.0\publish\Game.exe
+C:\Users\pixel\source\repos\pslib-cz\2022-p2a-prg-big-bad-project-Pixelgon\Game\bin\Release\net6.0\publish\Game.dll
+C:\Users\pixel\source\repos\pslib-cz\2022-p2a-prg-big-bad-project-Pixelgon\Game\bin\Release\net6.0\publish\Game.deps.json
+C:\Users\pixel\source\repos\pslib-cz\2022-p2a-prg-big-bad-project-Pixelgon\Game\bin\Release\net6.0\publish\Game.runtimeconfig.json
+C:\Users\pixel\source\repos\pslib-cz\2022-p2a-prg-big-bad-project-Pixelgon\Game\bin\Release\net6.0\publish\Game.pdb

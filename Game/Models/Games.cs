@@ -16,12 +16,14 @@ namespace Game.Models
         internal int _round { get; set; } = 0;
         internal int _tries { get; set; } = 0;
 
-        public Games(string wordlist = "Data/wordlist.txt")
+        public Games()
         {
-            string currentDirectory = AppDomain.CurrentDomain.BaseDirectory;
-            string absolutePath = Path.Combine(currentDirectory, wordlist);
-            _wordlistPath = absolutePath;
-            _wordList = FileHandlerer.LoadWordlist(_wordlistPath);
+            _wordlistPath = FileHandler.ReadWordlistPath();
+            if (_wordlistPath == null)
+            {
+                _wordlistPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data/wordlist.txt");
+            }
+            _wordList = FileHandler.LoadWordlist(_wordlistPath);
         }
 
         public bool Check(string word)
@@ -60,10 +62,11 @@ namespace Game.Models
         public bool ChangeWordlist(string adr)
         {
             Console.Clear();
-            string[] newWordlist = FileHandlerer.LoadWordlist(adr);
+            string[] newWordlist = FileHandler.LoadWordlist(adr);
             if (newWordlist.Length > 0)
             {
                 _wordList = newWordlist;
+                FileHandler.SaveWordlistPath(adr);
                 return true;
             }
             return false;
@@ -77,7 +80,7 @@ namespace Game.Models
         public bool Round(Players player)
         {
             _round++;
-            if(player._score % 1500 == 0 && player._hp > 0 && player._hp < 3)
+            if (player._score % 1500 == 0 && player._hp > 0 && player._hp < 3)
             {
                 player.AddHp();
             }
@@ -97,7 +100,7 @@ namespace Game.Models
             {
                 _currentWord = GetWord(_currentWord);
             }
-            if(_currentWord == null)
+            if (_currentWord == null)
             {
                 return false;
             }
@@ -107,7 +110,7 @@ namespace Game.Models
 
         public bool RoundChecking(string word, Players player)
         {
-            word = TextProcessor.RemoveSpecialCharacters(word);
+            word = TextProcessor.PrepareWord(word);
             if (Check(word))
             {
                 _currentWord = word;
@@ -128,14 +131,27 @@ namespace Game.Models
         {
             _round = 0;
             _tries = 0;
-            _wordList = FileHandlerer.LoadWordlist(_wordlistPath);
+            _wordList = FileHandler.LoadWordlist(_wordlistPath);
             player.Reset();
         }
 
         public void GenerateStat(string name, Games game, Players player)
         {
-            player.SetName(TextProcessor.RemoveSpecialCharacters(name));
-            FileHandlerer.SaveStatistic(game, player);
+            player.SetName(TextProcessor.PrepareWord(name));
+            FileHandler.SaveStatistic(game, player);
+        }
+
+        public static List<string[]> GetStatistic()
+        {
+            List<string[]> stats = FileHandler.LoadStatistic();
+            stats.Sort((row1, row2) =>
+            {
+                int score1 = int.Parse(row1[2]);
+                int score2 = int.Parse(row2[2]);
+                return score2.CompareTo(score1);
+            });
+
+            return stats;
         }
     }
 }

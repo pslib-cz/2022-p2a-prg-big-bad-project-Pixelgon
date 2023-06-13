@@ -6,10 +6,11 @@ using System.Threading.Tasks;
 
 namespace Game.Models
 {
-    internal class FileHandlerer
+    internal class FileHandler
     {
-        internal static string _dataRoot = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data");
-        internal static string _statsPath = Path.Combine(_dataRoot, "statistic.csv");
+        private static string _dataRoot = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data");
+        private static string _statsPath = Path.Combine(_dataRoot, "statistic.csv");
+        private static string _wordlistPath = Path.Combine(_dataRoot, "wordlistPath.txt");
 
         internal static string[] LoadWordlist(string wordlist)
         {
@@ -72,9 +73,9 @@ namespace Game.Models
             }
         }
 
-        internal static string[] LoadStatistic()
+        internal static List<string[]> LoadStatistic()
         {
-            List<string> statistic = new List<string>();
+            List<string[]> statistic = new List<string[]>();
 
             try
             {
@@ -83,13 +84,13 @@ namespace Game.Models
                     string line;
                     while ((line = sr.ReadLine()) != null)
                     {
-                        statistic.Add(line);
+                        statistic.Add(line.Split(';'));
                     }
                 }
             }
             catch (FileNotFoundException)
             {
-                Console.WriteLine("Soubor statistiky nebyl nalezen na adrese: " + _statsPath);
+                File.Create(_statsPath).Close();
             }
             catch (IOException)
             {
@@ -100,7 +101,66 @@ namespace Game.Models
                 Console.WriteLine("Nastala neznámá chyba: " + e.Message);
             }
 
-            return statistic.ToArray();
+            return statistic;
+        }
+
+        internal static void SaveWordlistPath(string path)
+        {
+            if (!Directory.Exists(_dataRoot))
+            {
+                Directory.CreateDirectory(_dataRoot);
+            }
+
+            if (!File.Exists(_wordlistPath))
+            {
+                File.Create(_wordlistPath).Close();
+            }
+
+            try
+            {
+                using (StreamWriter sw = new StreamWriter(_wordlistPath, false, Encoding.UTF8))
+                {
+                    sw.WriteLine(path);
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+            }
+        }   
+
+        internal static string ReadWordlistPath()
+        {
+            if (!Directory.Exists(_dataRoot))
+            {
+                Directory.CreateDirectory(_dataRoot);
+            }
+
+            if (!File.Exists(_wordlistPath))
+            {
+                File.Create(_wordlistPath).Close();
+            }
+            try
+            {
+                using (StreamReader sr = new StreamReader(_wordlistPath))
+                {
+                    return sr.ReadLine();
+                }
+            }
+            catch (FileNotFoundException)
+            {
+                Console.WriteLine("Soubor s cestou k slovníku nexistuje: " + _wordlistPath);
+            }
+            catch (IOException)
+            {
+                Console.WriteLine("Chyba při čtení souboru cesty k slovníku: " + _wordlistPath);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Nastala neznámá chyba: " + e.Message);
+            }
+
+            return null;
         }
     }
 }
